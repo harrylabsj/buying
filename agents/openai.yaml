@@ -1,0 +1,4 @@
+interface:
+  display_name: "Buying"
+  short_description: "比价、避坑、谈判、订阅审计一体化的购物决策 skill"
+  default_prompt: "Use $buying to research a purchase, compare prices across sources, detect deal red flags, recommend buy or wait, and provide negotiation or cancellation scripts when helpful."
