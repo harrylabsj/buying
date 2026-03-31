@@ -4,5 +4,6 @@
   "description": "Buying - 升级版购物决策助手，支持全网比价、品类研究、骗局识别、谈判建议和订阅审计",
   "keywords": ["buying", "shopping", "price-compare", "best-value", "deal", "negotiation", "scam-detection", "subscriptions"],
   "author": "openclaw",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": "https://github.com/harrylabsj/buying"
 }
