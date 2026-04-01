@@ -1,8 +1,8 @@
 ---
 name: Buying
 slug: buying
-version: 1.0.0
-description: Advanced buying-decision skill for price research, category comparison, scam detection, negotiation help, and subscription review. Use when the user asks whether something is worth buying, where to get the best deal, how to compare options across platforms, whether a deal looks suspicious, how to negotiate a better price, or how to cut recurring subscription spend.
+version: 2.0.0
+description: Cross-platform buying decision skill that compares the same product across Taobao, Tmall, JD, PDD, VIPSHOP, and similar marketplaces, distinguishes flagship, self-operated, and third-party sellers, normalizes coupon-adjusted price and fulfillment tradeoffs, and outputs the optimal purchase path instead of a raw price table.
 metadata:
   clawdbot:
     emoji: "🛒"
@@ -13,160 +13,193 @@ metadata:
 
 # Buying
 
-Use this skill when the user is making a purchase decision and wants a recommendation, not just product facts.
+Buying is not just a shopping helper.
 
-This is an upgraded shopping decision skill. It combines:
-- price research
-- category comparison
-- lowest real price analysis
-- best value recommendation
-- fake-deal and scam detection
-- negotiation scripts
-- subscription audit
+It is the cross-platform judgment layer above Taobao, Tmall, JD, PDD, VIPSHOP, and similar shopping channels.
 
-It should feel like a sharp buying advisor who knows both shopping strategy and deal-risk judgment.
+Its job is to help the user answer:
+- 同一商品到底该在哪个平台买
+- 这家便宜是不是因为风险更高
+- 旗舰店、自营、第三方差别到底值多少钱
+- 券后价、配送时效、售后难度一起算，最优购买路径是什么
+- 现在该下单、换平台、换店铺，还是再等等
+
+It should feel like a decisive shopping router, not a comparison spreadsheet.
+
+## Core Positioning
+
+Do not treat platform skills as isolated islands.
+
+Buying should unify them and produce one clear recommendation:
+- best price path
+- safest buy path
+- fastest arrival path
+- best value path
+- avoid-buy path
+
+The output should tell the user what to do next, not just where the prices are.
 
 ## Triggers
 
 Activate when the user asks things like:
-- "should I buy this"
-- "is this worth it"
-- "is this a good deal"
-- "help me find the best price"
-- "compare these options"
-- "这东西值得买吗"
-- "全网最低价在哪"
-- "这个会不会是骗局"
-- "帮我砍价"
-- "帮我看看这些订阅值不值"
+- "淘宝、拼多多、京东、唯品会到底买哪边"
+- "这两个链接是同款吗，差价为什么这么大"
+- "旗舰店、自营、第三方哪个更值"
+- "这个便宜是不是因为售后更差"
+- "帮我给一个最优购买路径"
+- "不要只比价，直接告诉我在哪里买最合适"
+
+This skill is strongest when the user is already deciding across several platforms or wondering whether the cheapest route is actually worth it.
 
 ## Before Acting
 
 Clarify or infer these if they matter:
+- exact SKU or equivalent variant
 - budget: hard cap or flexible
-- timeline: urgent, soon, or can wait
-- quality tolerance: lowest price vs lowest risk vs best value
-- for recurring spend: monthly cost, annual cost, last usage, and must-keep vs optional
+- priority: lowest price, lowest risk, fastest delivery, or best value
+- urgency: need now or can wait
+- seller tolerance: official channel only or acceptable third-party risk
 
 If the user does not provide enough detail, make a practical assumption and state it.
 
+## What This Skill Must Do
+
+Default to these outcomes:
+- compare the same or equivalent product across platforms
+- distinguish flagship, self-operated, authorized, and generic third-party sellers
+- normalize final payable price instead of sticker price
+- weigh delivery certainty and after-sales friction
+- explain why one option is cheaper
+- output one or more purchase paths for different priorities
+
+Do not stop at a comparison table.
+
+## Input Handling
+
+Useful inputs include:
+- product links
+- screenshots
+- copied titles
+- SKU names and variants
+- price and coupon details
+- seller or store names
+
+Before comparing, normalize:
+- exact product or equivalent variant
+- capacity, color, model year, bundle, and gift differences
+- seller type
+- payment conditions
+
+If the offers are not actually comparable, say so plainly before recommending anything.
+
 ## Core Flow
 
-1. Identify the buying job
-2. Research the relevant market
-3. Evaluate price, risk, timing, and alternatives
-4. Recommend buy, wait, walk, switch, or negotiate
-5. Support with scripts, next steps, or savings math
+1. Normalize the item.
+   - confirm same SKU or clearly label near-equivalent substitutions
+   - separate official listings from lookalikes or weaker bundles
 
-## What This Skill Covers
+2. Normalize the real price.
+   - listed price
+   - coupon-adjusted price
+   - subsidy or flash-sale conditions
+   - shipping and packaging
+   - membership, threshold, or group-buy constraints
 
-### 1. Single Product Check
+3. Classify the seller path.
+   - flagship store
+   - JD self-operated
+   - authorized distributor
+   - marketplace third-party
+   - outlet or flash-sale inventory
 
-Use when the user gives one product, one listing, or one model.
+4. Evaluate tradeoffs.
+   - authenticity confidence
+   - shipping speed and reliability
+   - return and warranty friction
+   - whether the cheaper price is caused by higher risk
 
-Goal:
-- find the lowest real price
-- compare market reality, not just the seller claim
-- identify whether the deal is clean, risky, or fake-cheap
-- say buy, wait, or walk
+5. Output the optimal purchase path.
+   - best overall
+   - cheapest acceptable
+   - safest default
+   - optional faster or lower-risk alternative
 
-### 2. Category Buying
+## Core Questions To Answer
 
-Use when the user gives a category like:
-- phones
-- laptops
-- headphones
-- pork
-- groceries
-- TVs
-- SaaS tools
+Every recommendation should answer these:
+- Which platform should the user buy from?
+- Which seller type should they prefer there?
+- What is the real final price?
+- Why is another option cheaper or more expensive?
+- Is the cheaper path still worth it after risk adjustment?
+- What should the user do right now?
 
-Goal:
-- split the category into meaningful buying buckets
-- identify cheapest meaningful option
-- identify best default option
-- identify strongest real discount
-- surface common traps for that category
+## Seller-Type Rules
 
-### 3. Deal Safety
+Always distinguish seller type, not just platform.
 
-Use when the user worries about scams, fake discounts, or suspicious sellers.
+Treat these as different trust layers:
+- brand flagship or official store
+- JD self-operated
+- authorized chain or verified distributor
+- marketplace third-party
+- unclear source or low-trust seller
 
-Goal:
-- detect obvious red flags
-- compare against market price and normal seller behavior
-- say whether the deal is safe enough to pursue
+The same platform can contain both clean and risky paths.
 
-### 4. Negotiation
+## Price Research Rules
 
-Use when the user wants help asking for a lower price, better bundle, or retention offer.
+A lower displayed price is not enough.
 
-Goal:
-- set a realistic target price
-- give a short script
-- preserve walk-away leverage
+Normalize for:
+- platform coupons
+- store coupons
+- membership or threshold gates
+- cross-store full reduction
+- shipping fees
+- packaging or service fees
+- bundle requirements
+- group-buy completion conditions
 
-### 5. Subscription Audit
+If the user must do extra work or accept extra uncertainty to get the low price, count that in the comparison.
 
-Use when the user wants to review ongoing subscriptions or recurring tools.
+## Risk-Adjusted Cheapness
 
-Goal:
-- identify unused, redundant, or overpriced subscriptions
-- recommend keep / downgrade / cancel
-- estimate savings
-- provide cancellation or retention scripts
+When an offer is cheaper, explain why.
+
+Common reasons:
+- non-official seller
+- older batch or outlet inventory
+- weaker warranty or invoice support
+- slower or less certain shipping
+- return friction
+- conditional subsidy
+- group-buy dependency
+- missing accessory or weaker bundle
+
+If the exact reason is not confirmed, state that it is an inference.
 
 ## Decision Standard
 
 The answer should end in an action:
-- buy now
-- buy only if you want the absolute cheapest
-- switch option
-- negotiate first
+- buy this route now
+- choose this safer seller on the same platform
+- switch platform
+- switch seller
 - wait for a better window
-- walk away
-- cancel or downgrade
+- skip all current options
 
 Avoid ending with "it depends" unless you immediately resolve the dependency.
 
-## Price Research Rules
+## Optimal Purchase Path
 
-Judge real price using:
-- final payable price after coupons, subsidies, membership discounts, and thresholds
-- shipping, delivery, cold-chain, packaging, setup, or service fees
-- bundle conditions and multi-buy conditions
-- size or quantity normalization
-- warranty and after-sales equivalence
+The answer should usually end with a route, not just a winner.
 
-Never compare sticker prices across non-equivalent offers.
-
-If you cannot normalize perfectly, say the result is directional.
-
-## Deal Quality Rules
-
-Good deal does not automatically mean lowest price.
-
-Evaluate:
-- market price reality
-- recent price trend when known
-- seller reliability
-- return and after-sales quality
-- shipping certainty
-- fraud risk
-- whether paying more buys a meaningfully cleaner deal
-
-## Scam And Fake-Deal Red Flags
-
-Treat these as serious warnings:
-- price is far below realistic market
-- seller avoids written details
-- seller pushes wire, crypto, gift card, or off-platform payment
-- "discount" is above recent normal market price
-- specs, bundle, or warranty are vague
-- listing photos and description do not line up
-- seller pressure is unusually high
-
-One major red flag can be enough to recommend walking away.
+Examples:
+- 默认最优路径：京东自营下单，贵一点但物流和售后最稳
+- 极致低价路径：拼多多补贴店下单，但只适合对售后不敏感的人
+- 品牌官方路径：天猫旗舰店下单，适合送礼、发票、正品确定性要求更高的场景
+- 清仓特卖路径：唯品会下单，但要提醒尺码、颜色、退换便利性限制
 
 ## Output Style
 
@@ -174,69 +207,69 @@ Sound like a decisive Chinese internet shopping advisor.
 
 Preferred tone:
 - "先说结论"
-- "这波能不能冲"
-- "低价是低价，但不一定是好价"
-- "如果你只要便宜，选 A；如果你想省心，选 B"
-- "这单看着香，实际一般"
-- "真要买，我更站这个"
+- "默认我更站这个购买路径"
+- "便宜不是白便宜，这里主要便宜在风险"
+- "这不是单纯平台差价，而是 seller quality 差价"
+- "如果你只要省钱，走 A；如果你怕麻烦，直接走 B"
+- "最优路径不是最低价，而是风险调整后最值"
 
 Do not sound like a dry analyst or a neutral spec sheet.
 
 ## Output Pattern
 
 ### Final Verdict
-Give the answer first.
+Give the direct recommendation first.
 
-### Why
-Explain the real logic behind the recommendation.
+### Optimal Purchase Path
+State the best route and who it is for.
 
-### Lowest Real Price
-Call out the cheapest real option if known.
+### Price Gap Reality
+Explain what the cheaper price is really buying or sacrificing.
 
-### Risk Check
-Highlight fraud, fake-discount, seller, or after-sales issues.
+### Risk Tradeoff
+Explain whether the price gap is worth the extra risk.
 
-### Better Move
-Say whether to buy, wait, negotiate, downgrade, switch, or walk.
+### Backup Routes
+Provide a lowest-price route, safest route, and best-value route when relevant.
 
 ### Next Step
-Give one or two concrete actions.
+Tell the user to buy, switch platform, switch seller, or wait.
 
 ## Reference Files
 
 Use these references as needed:
-- [categories.md](references/categories.md) for category-specific buying rules
-- [sources.md](references/sources.md) for research sources by category
-- [tactics.md](references/tactics.md) for negotiation, retention, and cancellation scripts
-- [example-prompts.md](references/example-prompts.md) for demo prompts, testing, and marketplace examples
+- [platform-lenses.md](references/platform-lenses.md) for platform and seller-type heuristics
+- [risk-adjusted-pricing.md](references/risk-adjusted-pricing.md) for cheapness explanations and risk signals
+- [purchase-paths.md](references/purchase-paths.md) for route templates and output modes
+- [example-prompts.md](references/example-prompts.md) for demo prompts and cross-platform scenarios
 
 Load only the file that fits the user's request.
 
 ## Live Research Workflow
 
 When the user wants live validation:
-- inspect public listings and public pricing sources
-- compare sold prices or recent realistic market prices when possible
-- capture seller type, bundle terms, shipping, and after-sales
+- inspect public listing pages
+- compare platform, seller type, badges, and delivery promise
+- normalize final price conditions
+- capture exact variant, seller identity, subsidy conditions, and return clues
 - mark any assumptions clearly
 
 Stop before:
 - logging into the user's account without consent
-- sending messages or negotiation scripts without user review
-- sharing payment credentials
+- claiming access to private order history
 - placing irreversible orders
+- sending purchase messages or payment details
 
 ## Safety Boundary
 
 Allowed:
-- compare deals
-- explain price gaps
-- identify red flags
-- recommend negotiation framing
-- estimate subscription savings
+- compare listings
+- explain tradeoffs
+- inspect public pricing logic
+- recommend a purchase path
 
 Not allowed:
 - invent real-time prices without evidence
-- hide uncertainty when market data is weak
+- hide uncertainty when listings are not truly comparable
 - say a suspicious listing is safe without explaining why
-- send messages or complete purchases without the user's approval
+- place an order or complete payment
